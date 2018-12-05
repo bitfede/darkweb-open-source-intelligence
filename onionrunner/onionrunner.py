@@ -62,7 +62,7 @@ def store_onion(onion):
 #
 # Runs onionscan as a child process
 #
-def run_onionstan(onion):
+def run_onionscan(onion):
     
     print("[*] Onionscanning %s" % onion)
 
@@ -88,7 +88,7 @@ def run_onionstan(onion):
 #
 # Handles timer timeout from the onionscan proces
 #
-def hadle_timeout(process, onion):
+def handle_timeout(process, onion):
     global session_onions
     global identity_lock
     
@@ -142,6 +142,7 @@ def process_results(onion, json_response):
 
     #look for additional .onion domains to add to our scan list
     scan_result = ur"%s" % json_response.decode("utf8")
+    print(scan_result)
     scan_result = json.loads(scan_result)
 
     #all possible outcomes covered here
