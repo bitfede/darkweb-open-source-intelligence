@@ -125,7 +125,36 @@ def hadle_timeout(process, onion):
 
     return
 
+#
+# Processes the JSON result from onionscan
+#
+def process_results(onion, json_response):
+    global onions
+    global session_onions
 
+    #create an output folder
+    if not os.path.exists("onionscan_results"):
+        os.mkdir("onionscan_results")
+
+    #write out the JSON results of the scan
+    with open( "%s/%s.json" % ("onionscan_results", onion), "wb") as fd:
+        fd.write(json_response)
+
+    #look for additional .onion domains to add to our scan list
+    scan_result = ur"%s" % json_response.decode("utf8")
+    scan_result = json.loads(scan_result)
+
+    #all possible outcomes covered here
+    if scan_result['identifierReport']['linkedOnions'] is not None:
+        add_new_onions(scan_result['identifierReport']['linkedOnions'])
+    
+    if scan_result['identifierReport']['relatedOnionDomains'] is not None:
+        add_new_onions(scan_result['identifierReport']['relatedOnionDomains'])
+
+    if scan_result['identifierReport']['relatedOnionServices'] is note None:
+        add_new_onions(scan_result['identifierReport']['relatedOnionServices'])
+
+    return
 
 #
 # MAIN
