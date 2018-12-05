@@ -106,7 +106,7 @@ def hadle_timeout(process, onion):
     with Controller.from_port(port=9051) as torcontrol:
 
         #auth
-        torcontrol.authenticate(os.environ("ONIONRUNNER_PW") )
+        torcontrol.authenticate(os.environ['ONIONRUNNER_PW'])
 
         #send the signal for a new identity
         torcontrol.signal(Signal.NEWNYM)
@@ -151,7 +151,7 @@ def process_results(onion, json_response):
     if scan_result['identifierReport']['relatedOnionDomains'] is not None:
         add_new_onions(scan_result['identifierReport']['relatedOnionDomains'])
 
-    if scan_result['identifierReport']['relatedOnionServices'] is note None:
+    if scan_result['identifierReport']['relatedOnionServices'] is not None:
         add_new_onions(scan_result['identifierReport']['relatedOnionServices'])
 
     return
@@ -178,13 +178,49 @@ def add_new_onions(new_onion_list):
 
 
 
-#
-# MAIN
-#
+##
+## MAIN
+##
 
-print("Hello welcome " + os.environ('ONIONRUNNER_PW') )
+print("-------------")
+print("-ONIONRUNNER-")
+print("-------------")
 
-get_onion_list()
+#get the list of onions to analyze
+onions = get_onion_list()
+
+#randomize the list a bit
+random.shuffle(onions)
+session_onions = list(onions)
+
+count = 0
+
+while count < len(onions):
+    
+    #if the event is cleared we will halt here
+    #otherwise we continue execution
+    identity_lock.wait()
+
+    #grab a new onion to scan
+    print("[*] Running %d of %d." % (count, len(onions)) )
+    onion = session_onions.pop()
+
+    #check if we already scanned this one
+    if os.path.exists("onionscan_results/%s.json" % onion ):
+
+        print("[!] Already retrieved %s. Skipping." % onion)
+        count += 1
+
+        continue
+
+    #run the scan
+    result = run_onionscan(onion)
+
+    #process reults
+    if result is not None:
+        if len(result):
+            process_results(onion, result)
+            count +=1
 
 
 
