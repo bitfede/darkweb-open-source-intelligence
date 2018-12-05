@@ -157,6 +157,28 @@ def process_results(onion, json_response):
     return
 
 #
+# Handle new onions
+#
+def add_new_onions(new_onion_list):
+    
+    global onions
+    global session_onions
+
+    for linked_onion in new_onion_list:
+        if linked_onion not in onions and linked_onion.endswith(".onion"):
+            print("[++] Discovered new .onion => %s" % linked_onion)
+
+            onions.append(linked_onion)
+            session_onions.append(linked_onion)
+            random.shuffle(session_onions)
+            store_onion(linked_onion)
+
+    return
+
+
+
+
+#
 # MAIN
 #
 
