@@ -69,8 +69,7 @@ def run_onionscan(onion):
     #fire up onionscan
     process = subprocess.Popen(["onionscan", "-jsonReport", onion], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    #start the timer for 5 minutes
-    print("Timer started >>>")
+    #start the timer
     process_timer = Timer(300, handle_timeout, args=[process, onion])
     process_timer.start()
 
@@ -105,9 +104,9 @@ def handle_timeout(process, onion):
 
     #switch Tor identities to guarantee that we have good connection
     with Controller.from_port(port=9051) as torcontrol:
-
+        
         #auth
-        torcontrol.authenticate(os.environ['ONIONRUNNER_PW'])
+        torcontrol.authenticate(os.environ["ONIONRUNNER_PW"])
 
         #send the signal for a new identity
         torcontrol.signal(Signal.NEWNYM)
@@ -143,7 +142,6 @@ def process_results(onion, json_response):
 
     #look for additional .onion domains to add to our scan list
     scan_result = ur"%s" % json_response.decode("utf8")
-    print(scan_result)
     scan_result = json.loads(scan_result)
 
     #all possible outcomes covered here
